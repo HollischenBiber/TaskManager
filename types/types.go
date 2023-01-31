@@ -1,6 +1,6 @@
 package types
 
-type authData struct {
+type AuthData struct {
 	Username string `json:"username"`
 	Pass     string `json:"pass"`
 }

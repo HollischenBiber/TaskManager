@@ -7,7 +7,7 @@ import (
 )
 
 func logIn(w http.ResponseWriter, r *http.Request) {
-	resp := authData{}
+	resp := types.authData{}
 
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
