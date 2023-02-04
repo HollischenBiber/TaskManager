@@ -1,4 +1,4 @@
-package types
+package http
 
 type AuthData struct {
 	Username string `json:"username"`

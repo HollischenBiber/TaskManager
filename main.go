@@ -1,40 +1,36 @@
 package main
 
 import (
-	"net/http"
+	"context"
+	"log"
 	"os"
+	"os/signal"
+	"syscall"
 
-	"github.com/gorilla/mux"
-	"github.com/joho/godotenv"
+	"github.com/HollischenBiber/TaskManager.git/app"
 )
-
-func corsMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-
-		if r.Method == "OPTIONS" {
-			w.Header().Set("Content-Type", "")
-			w.Header().Set("Access-Control-Allow-Headers", "*")
-			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS")
-			w.Header().Set("Allow", "GET, POST, PATCH, PUT, DELETE, OPTIONS")
-			return
-		}
-
-		next.ServeHTTP(w, r)
-	})
-}
 
 func main() {
 
-	if err := godotenv.Load(); err != nil {
-		panic(err)
+	a := app.Application{}
+
+	ctx, _ := signal.NotifyContext(context.Background(), syscall.SIGTERM, os.Interrupt)
+
+	err := a.Start()
+
+	if err != nil {
+
+		log.Fatal(err.Error())
+
 	}
-	r := mux.NewRouter()
 
-	r.HandleFunc("/api/login", logIn).Methods("GET")
-	r.HandleFunc("/api/logout", logOut).Methods("POST")
+	<-ctx.Done()
 
-	port, _ := os.LookupEnv("TASKPORT")
+	err = a.Stop()
 
-	http.ListenAndServe(port, corsMiddleware(r))
+	if err != nil {
+
+		log.Fatal(err.Error())
+
+	}
 }
